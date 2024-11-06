@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>새 게시글 작성</title>
+</head>
+<body>
+    <h1>새 게시글 작성</h1>
+
+    <form action="#" th:action="@{/posts}" th:object="${postPostDto}" method="post">
+        <div>
+            <label for="title">제목</label>
+            <input type="text" id="title" th:field="*{title}" placeholder="게시글 제목" required />
+        </div>
+
+        <div>
+            <label for="content">내용</label>
+            <textarea id="content" th:field="*{content}" placeholder="게시글 내용" required></textarea>
+        </div>
+
+        <div>
+            <button type="submit">게시글 작성</button>
+        </div>
+    </form>
+
+    <br>
+    <a href="/posts">게시글 목록으로 돌아가기</a>
+</body>
+</html>
