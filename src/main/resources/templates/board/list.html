@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>List</title>
+</head>
+<body>
+<h1>로그인 확인</h1>
+    <table>
+        <tr>
+            <th>이름</th>
+            <th>이메일</th>
+            <th>닉네임</th>
+        </tr>
+            <td th:text="${loginMember.name}"></td>
+            <td th:text="${loginMember.email}"></td>
+            <td th:text="${loginMember.nickname}"></td>
+    </table>
+</body>
+</html>
