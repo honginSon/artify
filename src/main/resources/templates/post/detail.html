@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>게시글 상세</title>
@@ -11,13 +11,22 @@
     <p>작성일: <span th:text="${post.created_at}"></span></p>
     <p>수정일: <span th:text="${post.edited_at}"></span></p>
 
+    <!-- 수정 버튼 (수정 페이지로 이동) -->
     <a th:href="@{/posts/{postId}/edit(postId=${post.post_id})}">수정</a>
 
-    <form th:action="@{/posts/{postId}/delete(postId=${post.post_id})}" method="post" style="display:inline;">
+    <!-- 삭제 버튼 (삭제 확인 후 삭제) -->
+    <form th:action="@{/posts/{postId}/delete(postId=${post.post_id})}" method="post" style="display:inline;" onsubmit="return confirmDelete()">
         <button type="submit">삭제</button>
     </form>
 
     <br><br>
     <a href="/posts">게시글 목록</a>
+
+    <!-- 삭제 확인을 위한 JavaScript 함수 -->
+    <script>
+        function confirmDelete() {
+            return confirm("정말로 삭제하시겠습니까?");
+        }
+    </script>
 </body>
 </html>
