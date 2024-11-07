@@ -47,9 +47,9 @@ public class MemberJdbcTemplateRepository implements MemberRepository {
     }
 
     @Override
-    public Optional<Member> check(MemberPostDto memberPostDto) {
+    public Optional<Member> check(Member member) {
         String sql = "SELECT * FROM member WHERE email=? AND password=?";
-        Member findMember = jdbcTemplate.queryForObject(sql, memberRowMapper, memberPostDto.getEmail(), memberPostDto.getPassword());
+        Member findMember = jdbcTemplate.queryForObject(sql, memberRowMapper, member.getEmail(), member.getPassword());
 
         return Optional.ofNullable(findMember);
     }

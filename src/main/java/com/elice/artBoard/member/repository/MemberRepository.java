@@ -11,7 +11,7 @@ public interface MemberRepository {
 
     Optional<Member> findById(int memberId);
 
-    Optional<Member> check(MemberPostDto memberPostDto);
+    Optional<Member> check(Member member);
 
     Member save(Member member);
 

@@ -2,7 +2,6 @@ package com.elice.artBoard.member.service;
 
 import com.elice.artBoard.member.repository.MemberRepository;
 import com.elice.artBoard.member.entity.Member;
-import com.elice.artBoard.member.entity.MemberPostDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,8 +25,8 @@ public class MemberService {
     }
 
     // DB에 로그인 할 회원이 있는지 조회
-    public Member checkMember(MemberPostDto memberPostDto) {
-        return memberRepository.check(memberPostDto)
+    public Member checkMember(Member member) {
+        return memberRepository.check(member)
                 .orElseThrow(() -> new RuntimeException("로그인 할 수 없습니다."));
     }
 
