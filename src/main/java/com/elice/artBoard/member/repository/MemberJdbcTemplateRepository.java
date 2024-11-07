@@ -1,8 +1,9 @@
 package com.elice.artBoard.member.repository;
 
 import com.elice.artBoard.member.entity.Member;
-import com.elice.artBoard.member.entity.MemberPostDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -15,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class MemberJdbcTemplateRepository implements MemberRepository {
+public class MemberJdbcTemplateRepository implements MemberRepository{
 
     @Autowired
     JdbcTemplate jdbcTemplate;
@@ -47,11 +48,29 @@ public class MemberJdbcTemplateRepository implements MemberRepository {
     }
 
     @Override
+    public Optional<Member> findByEmail(String email) {
+        String sql = "SELECT * FROM member WHERE email=?";
+
+        try {
+            Member findMember = jdbcTemplate.queryForObject(sql, memberRowMapper, email);
+
+            return Optional.ofNullable(findMember);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+
+    @Override
     public Optional<Member> check(Member member) {
         String sql = "SELECT * FROM member WHERE email=? AND password=?";
-        Member findMember = jdbcTemplate.queryForObject(sql, memberRowMapper, member.getEmail(), member.getPassword());
 
-        return Optional.ofNullable(findMember);
+        try {
+            Member findMember = jdbcTemplate.queryForObject(sql, memberRowMapper, member.getEmail(), member.getPassword());
+
+            return Optional.ofNullable(findMember);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
     }
 
     @Override

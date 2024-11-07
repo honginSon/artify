@@ -1,5 +1,6 @@
 package com.elice.artBoard.member.controller;
 
+import com.elice.artBoard.member.entity.MemberCheck;
 import com.elice.artBoard.member.mapper.MemberMapper;
 import com.elice.artBoard.member.service.MemberService;
 import com.elice.artBoard.member.entity.Member;
@@ -7,8 +8,9 @@ import com.elice.artBoard.member.entity.MemberPostDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 public class MemberController {
@@ -36,56 +38,78 @@ public class MemberController {
 
     // 로그인 처리
     @PostMapping("/login")
-    public String login(Model model, MemberPostDto memberPostDto) {
-        Member result = memberService.checkMember(memberPostDto);
+    public String login(MemberPostDto memberPostDto, Model model) {
+        Member member = memberMapper.MemberPostDtoToMember(memberPostDto);
 
+        Member result = memberService.checkMember(member);
+
+        // Todo:로그인이 안 되는 경우 처리
         if (result == null) {
-            // 이메일 또는 패스워드가 틀립니다
-            // 아직은 500 에러
+            return "redirect:/login";
         }
 
         model.addAttribute("loginMember", result);
 
-        // 이 부분은 로그인이 잘 되는지 확인
-        return "board/list";
+        // Todo: 이 부분은 나중에 게시판 홈으로 연결
+        return "member/profile";
     }
 
     // 회원 가입 화면
     @GetMapping("/create")
-    public String create() {
+    public String createForm(Model model) {
+        model.addAttribute("memberCreate", new MemberPostDto());
         return "member/create";
     }
 
     // 회원 가입 처리
     @PostMapping("/create")
-    public String create(Model model, MemberPostDto memberPostDto) {
-        Member member = memberMapper.MemberPostDtoToMember(memberPostDto);
+    public String signUp(@Validated @ModelAttribute("memberCreate") MemberPostDto memberPostDto, BindingResult result, Model model) {
+        memberService.checkDuplicate(new MemberCheck(memberPostDto), result);
 
-        Member newMember = memberService.createMember(member);
-        model.addAttribute("newMember", newMember);
+        if (result.hasErrors()) {
+            return "member/create";
+        }
+
+        Member member = memberMapper.MemberPostDtoToMember(memberPostDto);
+        memberService.createMember(member);
 
         return "redirect:/login";
     }
 
-/* Board 목록 보여주는 파일 받고 다시 개발
     @GetMapping("/{memberId}")
-    public String profile() {
-        return "member/detail";
+    public String detail(Model model, @PathVariable Integer memberId) {
+        Member member = memberService.findMember(memberId);
+
+        model.addAttribute("loginMember", member);
+
+        return "member/profile";
     }
 
-    @GetMapping("/{memberId}")
-    public String update(@PathVariable Integer id) {
+    @GetMapping("/edit/{memberId}")
+    public String update(Model model, @PathVariable Integer memberId) {
+        Member member = memberService.findMember(memberId);
+
+        model.addAttribute("findMember", member);
+
         return "member/update";
     }
 
-    @PutMapping("/{memberId}")
-    public String update(@PathVariable Integer id, MemberPostDto memberPostDto) {
+    @PutMapping("/edit/{memberId}")
+    public String update(@PathVariable Integer memberId, MemberPostDto memberPostDto) {
         Member member = memberMapper.MemberPostDtoToMember(memberPostDto);
+        member.setMemberId(memberId);
+
         memberService.updateMember(member);
 
-        return "redirect:/member/detail";
+        return "redirect:/" + memberId;
     }
-    */
+
+    @DeleteMapping("/{memberId}")
+    public String deleteMember(@PathVariable Integer memberId) {
+        memberService.deleteMember(memberId);
+
+        return "redirect:/";
+    }
 
     @GetMapping("/board")
     public String list() {

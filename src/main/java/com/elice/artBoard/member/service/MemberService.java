@@ -1,9 +1,12 @@
 package com.elice.artBoard.member.service;
 
+import com.elice.artBoard.member.entity.MemberCheck;
 import com.elice.artBoard.member.repository.MemberRepository;
 import com.elice.artBoard.member.entity.Member;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,8 +29,19 @@ public class MemberService {
 
     // DB에 로그인 할 회원이 있는지 조회
     public Member checkMember(Member member) {
-        return memberRepository.check(member)
-                .orElseThrow(() -> new RuntimeException("로그인 할 수 없습니다."));
+        if (memberRepository.check(member) == null) {
+            return null;
+        } else {
+            return memberRepository.check(member).orElseThrow(() -> new RuntimeException());
+        }
+    }
+
+    // 중복 회원 있는지
+    public void checkDuplicate(MemberCheck memberCheck, BindingResult result) {
+        // 이메일이 존재 하면
+        if (memberRepository.findByEmail(memberCheck.getEmail()) != null) {
+            result.addError(new FieldError(memberCheck.getObjectName(), "email", "이미 존재하는 회원입니다."));
+        }
     }
 
     // 새로운 회원 저장

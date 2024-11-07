@@ -11,6 +11,8 @@ public interface MemberRepository {
 
     Optional<Member> findById(int memberId);
 
+    Optional<Member> findByEmail(String email);
+
     Optional<Member> check(Member member);
 
     Member save(Member member);
