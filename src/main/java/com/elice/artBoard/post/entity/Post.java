@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
+
+import static com.elice.artBoard.post.constants.DefaultImgConst.DEFAULT_IMG_PATH;
 
 @Entity
 @Builder
@@ -15,7 +18,7 @@ import java.time.LocalDateTime;
 public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int post_id; // 게시글키
+    private Long id; // 게시글키
 
     private String title; // 게시글 제목
 
@@ -23,24 +26,51 @@ public class Post {
     private String content; // 게시글 내용
 
     @Column(name = "created_at", updatable = false)
-    private LocalDateTime created_at; // 생성 시간
+    private LocalDateTime createdAt; // 생성 시간
 
     @Column(name = "edited_at")
-    private LocalDateTime edited_at; // 수정 시간
+    private LocalDateTime editedAt; // 수정 시간
 
-    private int member_id; // 회원키(외래키)
-    private int board_id; // 게시판키(외래키)
+    private int memberId; // 회원키(외래키)
+    private int boardId; // 게시판키(외래키)
+
+    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
+    private List<PostImage> postImages;  // 해당 게시글에 속한 이미지 리스트
+
+    public String getImagePath() {
+        if (postImages != null && !postImages.isEmpty()) {
+            return postImages.get(0).getImagePath();  // 첫 번째 이미지만 반환 (여러 이미지가 있을 경우 로직 수정 필요)
+        }
+        return DEFAULT_IMG_PATH;  // 기본 이미지 경로
+    }
+
 
     // 엔티티가 처음 저장되기 전 호출 (생성 시간 설정)
     @PrePersist
     protected void onCreate() {
-        this.created_at = LocalDateTime.now();
+        this.createdAt = LocalDateTime.now();
     }
 
     // 엔티티가 업데이트되기 전 호출 (수정 시간 설정)
     @PreUpdate
     protected void onUpdate() {
-        this.edited_at = LocalDateTime.now();
+        this.editedAt = LocalDateTime.now();
+    }
+
+    private Post(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
+
+    public static Post create(String title, String content) {
+        return new Post(title, content);
+    }
+
+    public Post update(String title, String content) {
+        this.title = title;
+        this.content = content;
+
+        return this;
     }
 
 }
