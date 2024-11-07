@@ -5,27 +5,27 @@
     <title>게시글 목록</title>
 </head>
 <body>
-    <h1>게시글 목록</h1>
+<h1>게시글 목록</h1>
 
-    <table>
-        <thead>
-        <tr>
-            <th>번호</th>
-            <th>제목</th>
-            <th>작성일</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="post : ${posts}">
-            <td th:text="${post.post_id}"></td>
-            <!-- 제목을 클릭하면 해당 게시물의 상세 페이지로 이동 -->
-            <td><a th:href="@{/posts/{postId}(postId=${post.post_id})}" th:text="${post.title}"></a></td>
-            <td th:text="${#temporals.format(post.created_at, 'yyyy-MM-dd HH:mm')}"></td>
-        </tr>
-        </tbody>
-    </table>
+<table>
+    <thead>
+    <tr>
+        <th>번호</th>
+        <th>제목</th>
+        <th>작성일</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="post : ${posts}">
+        <td th:text="${post.id}"></td>
+        <!-- 제목을 클릭하면 해당 게시물의 상세 페이지로 이동 -->
+        <td><a th:href="@{/posts/{postId}(postId=${post.id})}" th:text="${post.title}"></a></td>
+        <td th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+    </tr>
+    </tbody>
+</table>
 
-    <br><br>
-    <a href="/posts/create">새 게시글 작성</a>
+<br><br>
+<a href="/posts/create">새 게시글 작성</a>
 </body>
 </html>
