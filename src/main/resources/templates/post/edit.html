@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>게시글 수정</title>
@@ -8,15 +8,20 @@
 <h1>게시글 수정</h1>
 
 <!-- 게시글 수정 폼 -->
-<form th:action="@{/posts/{postId}(postId=${postId})}" method="post">
+<form th:action="@{/posts/{postId}(postId=${postId})}" th:object="${postPostDto}" method="post" enctype="multipart/form-data">
     <div>
         <label for="title">제목:</label>
-        <input type="text" id="title" name="title" th:value="${postPostDto.title}" required/>
+        <input type="text" id="title" name="title" th:field="*{title}" required/>
     </div>
 
     <div>
         <label for="content">내용:</label>
-        <textarea id="content" name="content" th:text="${postPostDto.content}" required></textarea>
+        <textarea id="content" name="content" th:field="*{content}" required></textarea>
+    </div>
+
+    <div>
+        <label for="image">이미지 업로드</label>
+        <input type="file" id="image" th:field="*{image}">
     </div>
 
     <div>
