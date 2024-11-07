@@ -33,7 +33,7 @@
                                 <div class="d-flex justify-content-end">
                                     <a class="btn btn-outline-primary me-2"
                                        th:href="@{boards/put/{id}(id=${form.getBoardId()})}" th:text="'수정'"></a>
-                                    <a class="btn btn-outline-danger"
+                                    <a class="btn btn-outline-danger" onclick="return confirmDelete(event, this);"
                                        th:href="@{boards/delete/{id}(id=${form.getBoardId()})}" th:text="'삭제'"></a>
                                 </div>
                             </div>

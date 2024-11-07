@@ -4,5 +4,13 @@
     <meta charset="UTF-8">
     <title>Artify</title>
     <link th:href="@{/css/bootstrap.min.css}" href="../css/bootstrap.min.css" rel="stylesheet">
+    <script>
+        confirmDelete = (event, element) => {
+            event.preventDefault();
+            if (confirm("정말 삭제하겠습니까?")) {
+                window.location.href = element.getAttribute('href');
+            }
+        }
+    </script>
 </head>
 </html>
