@@ -8,14 +8,22 @@
     <h1>게시글 상세</h1>
     <h2 th:text="${post.title}"></h2>
     <p th:text="${post.content}"></p>
-    <p>작성일: <span th:text="${post.created_at}"></span></p>
-    <p>수정일: <span th:text="${post.edited_at}"></span></p>
+    <p>작성일: <span th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}"></span></p>
+    <p>수정일: <span th:text="${#temporals.format(post.editedAt, 'yyyy-MM-dd HH:mm')}"></span></p>
+
+    <!-- 이미지 표시 -->
+    <div>
+        <img width="10%" height="10%" th:src="@{/posts/image/{imageId}(imageId=${post.id})}" alt="게시글 이미지">
+<!--        <img th:src="@{/images/post/defaultImg.png}" alt="게시글 이미지">-->
+<!--        <img th:src="@{${post.getImagePath()}}" alt="게시글 이미지">-->
+<!--        <img th:src="@{/images/post/{imageName}(imageName=${post.postImages.get(0).imageName})}" alt="게시글 이미지">-->
+    </div>
 
     <!-- 수정 버튼 (수정 페이지로 이동) -->
-    <a th:href="@{/posts/{postId}/edit(postId=${post.post_id})}">수정</a>
+    <a th:href="@{/posts/{postId}/edit(postId=${post.id})}">수정</a>
 
     <!-- 삭제 버튼 (삭제 확인 후 삭제) -->
-    <form th:action="@{/posts/{postId}/delete(postId=${post.post_id})}" method="post" style="display:inline;" onsubmit="return confirmDelete()">
+    <form th:action="@{/posts/{postId}/delete(postId=${post.id})}" method="post" style="display:inline;" onsubmit="return confirmDelete()">
         <button type="submit">삭제</button>
     </form>
 
