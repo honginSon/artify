@@ -1,41 +1,9 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-    <link th:href="@{/css/bootstrap.min.css}" href="../css/bootstrap.min.css" rel="stylesheet">
-</head>
+<head th:replace="~{board/fragments/header :: header}"></head>
 <body>
-<div class="container">
-    <div class="d-flex justify-content-center mt-5">
-        <img th:src="@{/images/logo.png}"/>
-    </div>
-</div>
-<div class="container my-3 mt-5 d-flex justify-content-center">
-    <div class="container">
-        <form th:action method="post" th:object="${form}" enctype="multipart/form-data">
-            <div class="mb-3">
-                <label for="title" class="form-label">게시판 이름</label>
-                <input type="text" id="title" name="title" class="form-control" placeholder="제목을 입력하세요." th:field="*{title}"/>
-            </div>
-            <div class="mb-3">
-                <label for="description" class="form-label">게시판 설명</label>
-                <textarea id="description" name="description" class="form-control" style="height: 200px;"
-                          placeholder="설명을 입력하세요." th:field="*{description}"></textarea>
-
-            </div>
-            <div class="mb-5">
-                <label for="image" class="form-label">이미지 업로드</label>
-                <input class="form-control" type="file" id="image" name="image" th:field="*{image}">
-            </div>
-
-            <div class="d-flex justify-content-center">
-                <button type="submit" class="btn btn-primary" style="width: 10%;">게시판 추가</button>
-                <a class="btn btn-danger ms-3" style="width: 10%;" th:href="@{/boards}">취소</a>
-            </div>
-        </form>
-    </div>
-</div>
+<th:block th:insert="~{board/fragments/body :: header}"></th:block>
+<th:block th:insert="~{board/fragments/body :: createForm ('생성', '취소')}"></th:block>
 </body>
 </html>

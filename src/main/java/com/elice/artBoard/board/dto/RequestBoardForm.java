@@ -1,5 +1,6 @@
 package com.elice.artBoard.board.dto;
 
+import com.elice.artBoard.board.validator.AttachFileCheck;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -19,5 +20,6 @@ public class RequestBoardForm {
     @NotBlank(message = "설명은 필수 값 입니다.")
     private String description;
 
+    @AttachFileCheck
     private MultipartFile image;
 }

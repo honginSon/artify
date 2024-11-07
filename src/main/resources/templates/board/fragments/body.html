@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- 상단 logo 부분 -->
+<div th:fragment="header">
+    <div class="container">
+        <div class="d-flex justify-content-center mt-5">
+            <img th:src="@{/images/logo.png}"/>
+        </div>
+    </div>
+</div>
+
+<!-- list 출력 부분-->
+<th:block th:fragment="listForm">
+    <div class="d-flex  justify-content-around m-3">
+        <h2 class="text-center mt-3">게시판 목록</h2>
+        <a class="text-center btn btn-primary mt-3" th:href="@{/boards/create}"> 게시판 추가</a>
+    </div>
+    <div class="bg-light mt-5">
+        <div class="container">
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+                <th:block th:each="form : ${list}">
+                    <div class="col mb-3 mt-3">
+                        <div class="card shadow-sm">
+                            <img width="100%" height="225" class="border border-radius=10px rounded"
+                                 th:src="@{boards/image/{id}(id=${form.getImageId()})}">
+                            <div class="card-body">
+                                <div class="card-">
+                                    <h4 class="board-title" th:text="${form.getTitle()}">게시판 이름</h4>
+                                    <p th:text="${form.getDescription()}">게시판 설명</p>
+                                </div>
+                                <div class="d-flex justify-content-end">
+                                    <a class="btn btn-outline-primary me-2"
+                                       th:href="@{boards/put/{id}(id=${form.getBoardId()})}" th:text="'수정'"></a>
+                                    <a class="btn btn-outline-danger"
+                                       th:href="@{boards/delete/{id}(id=${form.getBoardId()})}" th:text="'삭제'"></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </th:block>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+<!-- 게시판 업로드 및 수정 부분 -->
+<th:block th:fragment="createForm (createButtonName, cancelButtonName)">
+    <div class="container my-3 mt-5 d-flex justify-content-center">
+        <div class="container">
+            <form th:action method="post" th:object="${form}" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label for="title" class="form-label">게시판 이름</label>
+                    <input type="text" id="title" class="form-control" placeholder="제목을 입력하세요."
+                           th:field="*{title}" th:errorclass="border-danger"/>
+                    <p class="text-danger" th:errors="*{title}"></p>
+                </div>
+                <div class="mb-3">
+                    <label for="description" class="form-label">게시판 설명</label>
+                    <textarea id="description" class="form-control" style="height: 200px;"
+                              placeholder="설명을 입력하세요." th:field="*{description}"
+                              th:errorclass="border-danger"></textarea>
+                    <p class="text-danger" th:errors="*{description}"></p>
+
+                </div>
+                <div class="mb-5">
+                    <label for="image" class="form-label">이미지 업로드</label>
+                    <input class="form-control" type="file" id="image" accept="image/*"
+                           th:field="*{image}" th:errorclass="border-danger"/>
+                    <p class="text-danger" th:errors="*{image}"></p>
+                </div>
+
+                <div class="d-flex justify-content-center">
+                    <button type="submit" class="btn btn-primary" style="width: 10%;"
+                            th:text="${createButtonName}">추가
+                    </button>
+                    <a class="btn btn-danger ms-3" style="width: 10%;"
+                       th:text="${cancelButtonName}" th:href="@{/boards}">취소</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</th:block>
+</body>
+</html>
