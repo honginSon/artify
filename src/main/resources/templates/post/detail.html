@@ -23,8 +23,11 @@
 
         <!-- 이미지 표시 -->
         <div class="text-center">
-            <img width="20%" height="20%" th:src="@{/posts/image/{imageId}(imageId=${post.id})}" alt="게시글 이미지">
+            <th:block th:if="${imageId != null}">
+                <img width="20%" height="20%" th:src="@{/posts/image/{imageId}(imageId=${imageId})}" alt="게시글 이미지">
+            </th:block>
         </div>
+
         <br>
         <div class="border p-3">
             <p th:text="${post.content}"></p>

@@ -20,7 +20,7 @@ public class PostImage {
     @Column(name = "post_image_name", nullable = false)
     private String imageName;
 
-    @Column(name = "post_image_path", nullable = false)
+    @Column(name = "post_image_path")
     private String imagePath;
 
     @ManyToOne(fetch = FetchType.LAZY)

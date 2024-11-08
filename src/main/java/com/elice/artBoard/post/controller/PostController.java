@@ -49,11 +49,8 @@ public class PostController {
     @GetMapping
     public String getAllPosts(Model model) {
         List<Post> posts = postService.getAllPosts();
-        List<PostImage> images = postImageService.findImagesByPostId(posts);
 
-        List<PostResponseDto> responseDtoList = getPostResponseDtoList(posts, images);
-
-        model.addAttribute("posts", responseDtoList);
+        model.addAttribute("posts", posts);
 
         return "post/list";
     }
@@ -61,13 +58,16 @@ public class PostController {
     // 특정 게시글 조회
     @GetMapping("/{postId}")
     public String getPost(@PathVariable Long postId, Model model) {
-//        Post post = postService.getPost(postId);
-//        model.addAttribute("post", post);
-
         Post post = postService.getPost(postId);
-        PostImage postImage = postImageService.findByPostId(postId);  // 게시글에 연결된 이미지 찾기
+        PostImage postImage = postImageService.findImageByPostId(post);  // 게시글에 연결된 이미지 찾기
+
         model.addAttribute("post", post);
-        model.addAttribute("imagePath", postImage != null ? postImage.getImagePath() : DEFAULT_IMG_PATH);  // 이미지 경로 추가
+        if (postImage != null) {
+            model.addAttribute("imageId", postImage.getId());  // 이미지 ID를 모델에 추가
+        } else {
+            model.addAttribute("imageId", null);  // 이미지가 없으면 null로 설정
+        }
+
         return "post/detail";  // 게시글 상세 페이지로 이동
     }
 
@@ -82,17 +82,6 @@ public class PostController {
     // 게시글 생성 처리
     @PostMapping
     public String createPost(@Validated @ModelAttribute("postPostDto") PostPostDto postPostDto) {
-        // 유효성 검사 실패 시, 폼 페이지로 돌아감
-//        if (bindingResult.hasErrors()) {
-//            return "post/create"; // 오류가 있으면 "post/create" 페이지로 돌아감
-//        }
-
-//        Post post = new Post();
-//        post.setTitle(postPostDto.getTitle());
-//        post.setContent(postPostDto.getContent());
-//
-//        postService.savePost(post);
-
         Post post = postService.save(postPostDto);
         postImageService.save(postPostDto, post);
         return "redirect:/posts";
@@ -101,14 +90,6 @@ public class PostController {
     // 게시글 수정 페이지
     @GetMapping("/{postId}/edit")
     public String editPostForm(@PathVariable Long postId, Model model) {
-//        Post post = postService.getPost(postId);
-//        PostPostDto postPostDto = new PostPostDto(post.getTitle(), post.getContent());
-//        model.addAttribute("postId", postId);
-//        model.addAttribute("postPostDto", postPostDto);
-
-//        Post post = postService.getPost(postId);
-//        model.addAttribute("postPostDto", new PostPostDto(post.getTitle(), post.getContent(), null));
-
         Post post = postService.getPost(postId);
         PostPostDto postPostDto = new PostPostDto(post.getTitle(), post.getContent(), null);
         model.addAttribute("postPostDto", postPostDto); // DTO를 모델에 추가
@@ -119,11 +100,6 @@ public class PostController {
     // 게시글 수정 처리
     @PostMapping("/{postId}")
     public String updatePost(@PathVariable Long postId, @Validated @ModelAttribute("postPostDto") PostPostDto postPostDto, BindingResult bindingResult) {
-//        Post post = postService.getPost(postId);
-//        post.setTitle(postPostDto.getTitle());
-//        post.setContent(postPostDto.getContent());
-//        postService.savePost(post);
-
         if (bindingResult.hasErrors()) {
             return "post/edit";
         }
@@ -138,8 +114,6 @@ public class PostController {
     // 특정 게시글 삭제
     @PostMapping("/{postId}/delete")
     public String deletePost(@PathVariable Long postId) {
-        //postService.deletePost(postId);
-
         postImageService.delete(postId);
         postService.deletePost(postId);
         return "redirect:/posts";

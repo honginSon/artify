@@ -28,20 +28,21 @@ public class PostImageService {
     private String fileDir;
 
     public PostImage save(PostPostDto postPostDto, Post post) {
-
         MultipartFile formImage = postPostDto.getImage();
 
         PostImage image = null;
-        if (formImage.isEmpty()) {
-            image = PostImage.createDefaultImage(post);
-
-        } else {
+        if (!formImage.isEmpty()) {  // 이미지가 있을 때만 생성
             String imagePath = getImagePath(formImage.getOriginalFilename());
             saveImage(formImage, imagePath);
             image = PostImage.create(formImage.getOriginalFilename(), imagePath, post);
         }
 
-        return postImageRepository.save(image);
+        // 이미지가 없으면 PostImage를 생성하지 않음
+        if (image != null) {
+            return postImageRepository.save(image);  // 이미지가 있을 경우만 저장
+        } else {
+            return null;  // 이미지가 없으면 null 반환
+        }
     }
 
     public void delete(Long postId) {
@@ -64,19 +65,17 @@ public class PostImageService {
         save(postPostDto, post);
     }
 
-    public List<PostImage> findImagesByPostId(List<Post> posts) {
-        return posts.stream()
-                .map(post -> {
-                    return findByPostId(post.getId());
-                }).toList();
+    public PostImage findImageByPostId(Post post) {
+        return postImageRepository.findByPostId(post.getId()).orElse(null);
     }
+
 
     public PostImage findByImgId(Long postImageId) {
         return postImageRepository.findById(postImageId).get();
     }
 
-    public PostImage findByPostId(Long bordId) {
-        return postImageRepository.findByPostId(bordId).get();
+    public Optional<PostImage> findByPostId(Long bordId) {
+        return postImageRepository.findByPostId(bordId);
     }
 
     private String getImagePath(String originalFilename) {
