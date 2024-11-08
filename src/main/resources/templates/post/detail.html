@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>게시글 상세</title>
+    <link th:href="@{/css/bootstrap.min.css}" href="../css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <div class="d-flex justify-content-center mt-5">
+        <img th:src="@{/images/logo.png}"/>
+    </div>
+</div>
+<div class="d-flex justify-content-center">
+    <div class="container">
+<!--        <h1>게시글 상세</h1>-->
+        <h2 th:text="${post.title}"></h2>
+        <div class="d-flex justify-content-end">
+            <p>작성일: <span th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}"></span></p>
+            <p>수정일: <span th:text="${#temporals.format(post.editedAt, 'yyyy-MM-dd HH:mm')}"></span></p>
+        </div>
+
+
+        <!-- 이미지 표시 -->
+        <div class="text-center">
+            <th:block th:if="${imageId != null}">
+                <img width="20%" height="20%" th:src="@{/posts/image/{imageId}(imageId=${imageId})}" alt="게시글 이미지">
+            </th:block>
+        </div>
+
+        <br>
+        <div class="border p-3">
+            <p th:text="${post.content}"></p>
+        </div>
+<!--        <p>작성일: <span th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}"></span></p>-->
+<!--        <p>수정일: <span th:text="${#temporals.format(post.editedAt, 'yyyy-MM-dd HH:mm')}"></span></p>-->
+
+        <br>
+        <div class="d-flex justify-content-center">
+            <a class="btn btn-primary" th:href="@{/posts/{postId}/edit(postId=${post.id})}" style="width: 10%; background-color: #CB8BFF; color: white; border: none;">수정</a>
+            <form th:action="@{/posts/{postId}/delete(postId=${post.id})}" method="post" style="display:flex; width: 10%" onsubmit="return confirmDelete()">
+                <button type="submit" class="btn btn-danger flex-grow-1 mx-1 ms-3" style="background-color: #CDCDCD; color: white; border: none;">
+                    삭제
+                </button>
+            </form>
+        </div>
+<!--        -->
+<!--        <br><br>-->
+<!--        <a href="/posts">게시글 목록</a>-->
+    </div>
+</div>
+    <!-- 삭제 확인을 위한 JavaScript 함수 -->
+    <script>
+        function confirmDelete() {
+            return confirm("정말로 삭제하시겠습니까?");
+        }
+    </script>
+</body>
+</html>
