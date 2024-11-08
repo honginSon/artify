@@ -6,8 +6,6 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.elice.artBoard.post.constants.DefaultImgConst.DEFAULT_IMG_PATH;
-
 @Entity
 @Builder
 @Getter
@@ -36,13 +34,6 @@ public class Post {
 
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
     private List<PostImage> postImages;  // 해당 게시글에 속한 이미지 리스트
-
-    public String getImagePath() {
-        if (postImages != null && !postImages.isEmpty()) {
-            return postImages.get(0).getImagePath();  // 첫 번째 이미지만 반환 (여러 이미지가 있을 경우 로직 수정 필요)
-        }
-        return DEFAULT_IMG_PATH;  // 기본 이미지 경로
-    }
 
 
     // 엔티티가 처음 저장되기 전 호출 (생성 시간 설정)

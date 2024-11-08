@@ -3,9 +3,6 @@ package com.elice.artBoard.post.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import static com.elice.artBoard.post.constants.DefaultImgConst.DEFAULT_IMG_PATH;
-import static com.elice.artBoard.post.constants.DefaultImgConst.DEFAULT_IMAGE_NAME;
-
 @Entity
 @Getter
 @Setter
@@ -35,10 +32,6 @@ public class PostImage {
 
     public static PostImage create(String imageName, String imagePath, Post post) {
         return new PostImage(imageName, imagePath, post);
-    }
-
-    public static PostImage createDefaultImage(Post post) {
-        return new PostImage(DEFAULT_IMG_PATH, DEFAULT_IMAGE_NAME, post);
     }
 
 }

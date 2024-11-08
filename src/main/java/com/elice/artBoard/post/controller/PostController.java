@@ -23,13 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
-
-import static com.elice.artBoard.post.constants.DefaultImgConst.DEFAULT_IMG_PATH;
 
 @Slf4j
 @Controller
@@ -127,42 +121,10 @@ public class PostController {
         return getResponse(image);
     }
 
-
-
-    private List<PostResponseDto> getPostResponseDtoList(List<Post> posts, List<PostImage> images) {
-        List<PostResponseDto> responseDtoList = new ArrayList<>();
-        int bound = posts.size();
-
-        // 게시글과 이미지 정보를 결합하여 PostResponseDto 객체 생성
-        IntStream.range(0, bound).forEach(i -> {
-            Post post = posts.get(i);
-            PostImage postImage = images.get(i);  // 해당 게시글에 연결된 이미지
-
-            // PostResponseDto에 게시글 정보와 이미지 ID를 담습니다.
-            responseDtoList.add(new PostResponseDto(
-                    post.getId(),
-                    post.getTitle(),
-                    post.getContent(),
-                    post.getCreatedAt(),
-                    post.getEditedAt(),
-                    post.getMemberId(),
-                    post.getBoardId(),
-                    postImage.getId()  // 이미지 ID를 포함
-            ));
-        });
-
-        return responseDtoList;
-    }
-
     private ResponseEntity getResponse(PostImage image) throws MalformedURLException {
         Resource resource;
 
-        if (image.getImagePath().equals(DEFAULT_IMG_PATH)) {
-            resource = new ClassPathResource(DEFAULT_IMG_PATH);
-
-        } else {
-            resource = new UrlResource("file:" + image.getImagePath());
-        }
+        resource = new UrlResource("file:" + image.getImagePath());
 
         return ResponseEntity.ok()
                 .contentType(MediaType.IMAGE_JPEG)
