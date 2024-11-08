@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>회원가입</title>
+
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}"/>
+
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+
+    <style>
+        .error-message {
+            color:red;
+        }
+    </style>
+</head>
+
+<body class="d-flex justify-content-center align-items-center vh-100">
+
+    <div class="text-center">
+        <div class="mb-4">
+            <img th:src="@{/images/logo.png}"/>
+        </div>
+
+        <div class="card p-4 shadow-sm text-center">
+
+            <form action="" method="post" th:object="${memberCreate}">
+                <div class="mb-3">
+                    <input type="text" th:field="*{name}" name="name" placeholder="이름" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <input type="email" th:field="*{email}" name="email" placeholder="이메일" class="form-control" required>
+                    <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="error-message">이메일 오류</div>
+                </div>
+                <div class="mb-3">
+                    <input type="password" th:field="*{password}" name="password" placeholder="비밀번호" class="form-control" required>
+                    <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="error-message">비밀번호 오류</div>
+                </div>
+                <div class="mb-3">
+                    <input type="text" th:field="*{nickname}" name="nickname" placeholder="닉네임" class="form-control" required>
+                </div>
+                <button type="submit" class="btn custom-button w-100">회원가입</button>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>
