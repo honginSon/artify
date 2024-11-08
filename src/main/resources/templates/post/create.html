@@ -19,7 +19,8 @@
         <form action="#" th:action="@{/posts}" th:object="${postPostDto}" method="post" enctype="multipart/form-data">
             <div class="mb-3">
                 <label for="title" class="form-label">제목</label>
-                <input type="text" id="title" th:field="*{title}" placeholder="제목을 입력하세요." required class="form-control"/>
+                <input type="text" id="title" th:field="*{title}" placeholder="제목을 입력하세요." required class="form-control" th:errorclass="border-danger"/>
+                <p class="text-danger" th:errors="*{title}"></p>
             </div>
 
             <div class="mb-3">
