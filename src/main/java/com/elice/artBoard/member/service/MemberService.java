@@ -40,7 +40,7 @@ public class MemberService {
     // 중복 회원 있는지
     public void checkDuplicate(MemberCheck memberCheck, BindingResult result) {
         // 이메일이 존재 하면
-        if (memberRepository.findByEmail(memberCheck.getEmail()) != null) {
+        if (memberRepository.findByEmail(memberCheck.getEmail()).isPresent()) {
             result.addError(new FieldError(memberCheck.getObjectName(), "email", "이미 존재하는 회원입니다."));
         }
     }

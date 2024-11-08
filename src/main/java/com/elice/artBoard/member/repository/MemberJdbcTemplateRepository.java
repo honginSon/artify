@@ -56,7 +56,8 @@ public class MemberJdbcTemplateRepository implements MemberRepository{
 
             return Optional.ofNullable(findMember);
         } catch (EmptyResultDataAccessException e) {
-            return null;
+            System.out.println(e.getMessage());
+            return Optional.empty();
         }
     }
 
