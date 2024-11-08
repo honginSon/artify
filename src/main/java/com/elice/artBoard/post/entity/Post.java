@@ -1,5 +1,6 @@
 package com.elice.artBoard.post.entity;
 
+import com.elice.artBoard.board.domain.Board;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,7 +31,10 @@ public class Post {
     private LocalDateTime editedAt; // 수정 시간
 
     private int memberId; // 회원키(외래키)
-    private int boardId; // 게시판키(외래키)
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "board_id")
+    private Board board; // 게시판 외래키로 단방향 관계 설정
 
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
     private List<PostImage> postImages;  // 해당 게시글에 속한 이미지 리스트
@@ -48,13 +52,14 @@ public class Post {
         this.editedAt = LocalDateTime.now();
     }
 
-    private Post(String title, String content) {
+    private Post(String title, String content, Board board) {
         this.title = title;
         this.content = content;
+        this.board = board;
     }
 
-    public static Post create(String title, String content) {
-        return new Post(title, content);
+    public static Post create(String title, String content, Board board) {
+        return new Post(title, content, board);
     }
 
     public Post update(String title, String content) {

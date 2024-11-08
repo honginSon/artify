@@ -16,7 +16,8 @@
     <div class="container">
         <h2>게시글 작성</h2>
 
-        <form action="#" th:action="@{/posts}" th:object="${postPostDto}" method="post" enctype="multipart/form-data">
+        <form th:action="@{/posts/create}" th:object="${postPostDto}" method="post" enctype="multipart/form-data">
+            <input type="hidden" th:value="*{boardId}" name="boardId" />
             <div class="mb-3">
                 <label for="title" class="form-label">제목</label>
                 <input type="text" id="title" th:field="*{title}" placeholder="제목을 입력하세요." required class="form-control" th:errorclass="border-danger"/>
@@ -39,7 +40,7 @@
 
             <div class="d-flex justify-content-center">
                 <button type="submit" class="btn btn-primary" style="width: 10%; background-color: #CB8BFF; color: white; border: none;">작성</button>
-                <a class="btn btn-danger ms-3" style="width: 10%; background-color: #CDCDCD; color: white; border: none;" th:href="@{/posts}">취소</a>
+                <a class="btn btn-danger ms-3" style="width: 10%; background-color: #CDCDCD; color: white; border: none;" href="/posts">취소</a>
             </div>
         </form>
 

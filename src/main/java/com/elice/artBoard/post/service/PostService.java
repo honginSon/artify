@@ -1,5 +1,7 @@
 package com.elice.artBoard.post.service;
 
+import com.elice.artBoard.board.repository.BoardRepository;
+import com.elice.artBoard.board.domain.Board;
 import com.elice.artBoard.post.entity.Post;
 import com.elice.artBoard.post.entity.PostPostDto;
 import com.elice.artBoard.post.repository.PostRepository;
@@ -16,10 +18,12 @@ import java.util.List;
 @Service
 public class PostService {
     private final PostRepository postRepository;
+    private final BoardRepository boardRepository;
 
     @Autowired
-    public PostService(PostRepository postRepository) {
+    public PostService(PostRepository postRepository, BoardRepository boardRepository) {
         this.postRepository = postRepository;
+        this.boardRepository = boardRepository;
     }
 
     // 모든 게시글 조회
@@ -34,11 +38,10 @@ public class PostService {
     }
 
     // 게시글 저장
-    /*public Post savePost(Post post) {
-        return postRepository.save(post);
-    }*/
-    public Post save(PostPostDto postPostDto) {
-        Post post = Post.create(postPostDto.getTitle(), postPostDto.getContent());
+    public Post save(PostPostDto postPostDto, Long boardId) {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new RuntimeException("Board not found"));
+        Post post = Post.create(postPostDto.getTitle(), postPostDto.getContent(), board);
         return postRepository.save(post);
     }
 
@@ -52,4 +55,9 @@ public class PostService {
         Post post = postRepository.findById(postId).orElseThrow(() -> new RuntimeException("Post not found"));
         postRepository.delete(post);
     }
+
+    public List<Post> findPostsByBoardId(Long boardId) {
+        return postRepository.findByBoardId(boardId);  // Board와 연결된 게시글 조회
+    }
+
 }

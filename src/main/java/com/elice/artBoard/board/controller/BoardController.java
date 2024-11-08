@@ -6,6 +6,8 @@ import com.elice.artBoard.board.dto.RequestBoardForm;
 import com.elice.artBoard.board.dto.ResponseBoardForm;
 import com.elice.artBoard.board.service.BoardImageService;
 import com.elice.artBoard.board.service.BoardService;
+import com.elice.artBoard.post.service.PostService;
+import com.elice.artBoard.post.entity.Post;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
@@ -35,6 +37,7 @@ public class BoardController {
 
     private final BoardService boardService;
     private final BoardImageService boardImageService;
+    private final PostService postService;
 
     @GetMapping
     public String boardList(Model model) {
@@ -99,10 +102,20 @@ public class BoardController {
         return getResponse(image);
     }
 
-    //TODO 게시글 추가 후 개발
-//    @GetMapping("/{id}")
-//    public String board(Long boardId) {
-//    }
+    // 게시글 연결
+    @GetMapping("/board/{boardId}")
+    public String getBoard(@PathVariable Long boardId, Model model) {
+        // boardId를 사용하여 해당 게시판에 연결된 게시글 목록을 가져옴
+        List<Post> posts = postService.findPostsByBoardId(boardId);  // 게시판에 해당하는 게시글 목록을 가져오는 메서드
+
+        // 게시글 목록을 모델에 추가하여 전달
+        model.addAttribute("posts", posts);
+
+        // 게시판 상세 페이지 대신 게시글 목록 페이지로 이동
+        return "post/list";  // 게시판에 속한 게시글 목록을 보여주는 뷰로 이동
+    }
+
+
 
     private List<ResponseBoardForm> getResponseFormList(List<Board> boards, List<BoardImage> images) {
 
