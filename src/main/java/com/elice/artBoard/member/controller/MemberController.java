@@ -52,8 +52,7 @@ public class MemberController {
             return "member/login";
         }
 
-        // Todo: 이 부분은 나중에 게시판 홈으로 연결
-        return "member/profile";
+        return "redirect:/boards";
     }
 
     // 회원 가입 화면
@@ -111,10 +110,5 @@ public class MemberController {
         memberService.deleteMember(memberId);
 
         return "redirect:/";
-    }
-
-    @GetMapping("/board")
-    public String list() {
-        return "board/list";
     }
 }
