@@ -1,6 +1,7 @@
 package com.elice.artBoard.member.controller;
 
 import com.elice.artBoard.member.entity.MemberCheck;
+import com.elice.artBoard.member.exception.MemberNotFoundException;
 import com.elice.artBoard.member.mapper.MemberMapper;
 import com.elice.artBoard.member.service.MemberService;
 import com.elice.artBoard.member.entity.Member;
@@ -41,14 +42,15 @@ public class MemberController {
     public String login(MemberPostDto memberPostDto, Model model) {
         Member member = memberMapper.MemberPostDtoToMember(memberPostDto);
 
-        Member result = memberService.checkMember(member);
+        try {
+            Member result = memberService.checkMember(member);
 
-        // Todo:로그인이 안 되는 경우 처리
-        if (result == null) {
-            return "redirect:/login";
+            model.addAttribute("loginMember", result);
+        } catch (MemberNotFoundException e) {
+            model.addAttribute("msg", e.getMessage());
+
+            return "member/login";
         }
-
-        model.addAttribute("loginMember", result);
 
         // Todo: 이 부분은 나중에 게시판 홈으로 연결
         return "member/profile";

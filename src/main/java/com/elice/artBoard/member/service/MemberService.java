@@ -1,6 +1,7 @@
 package com.elice.artBoard.member.service;
 
 import com.elice.artBoard.member.entity.MemberCheck;
+import com.elice.artBoard.member.exception.MemberNotFoundException;
 import com.elice.artBoard.member.repository.MemberRepository;
 import com.elice.artBoard.member.entity.Member;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,11 +29,11 @@ public class MemberService {
     }
 
     // DB에 로그인 할 회원이 있는지 조회
-    public Member checkMember(Member member) {
-        if (memberRepository.check(member) == null) {
-            return null;
+    public Member checkMember(Member member) throws MemberNotFoundException {
+        if (memberRepository.check(member).isEmpty()) {
+            throw new MemberNotFoundException("로그인 정보가 틀립니다.");
         } else {
-            return memberRepository.check(member).orElseThrow(() -> new RuntimeException());
+            return memberRepository.check(member).orElseThrow(() ->  new RuntimeException("서버 내부 오류로 나중에 다시 로그인해주세요."));
         }
     }
 
