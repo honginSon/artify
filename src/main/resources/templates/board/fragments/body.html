@@ -15,7 +15,7 @@
 <th:block th:fragment="listForm">
     <div class="d-flex  justify-content-around m-3">
         <h2 class="text-center mt-3">게시판 목록</h2>
-        <a class="text-center btn btn-primary mt-3" th:href="@{/boards/create}"> 게시판 추가</a>
+        <a class="text-center btn btn-primary mt-4" th:href="@{/boards/create}" style="background-color: #CB8BFF; color: white; border: none;"> 게시판 추가</a>
     </div>
     <div class="bg-light mt-5">
         <div class="container">
@@ -51,10 +51,10 @@
         <div class="container">
             <form th:action method="post" th:object="${form}" enctype="multipart/form-data">
                 <input type="hidden" name="_method" th:if="${method != 'POST' and method != 'post' and method != 'GET' and method != 'get'}"
-                       th:value="method">
+                       th:value="${method}">
                 <div class="mb-3">
                     <label for="title" class="form-label">게시판 이름</label>
-                    <input type="text" id="title" class="form-control" placeholder="제목을 입력하세요."
+                    <input type="text" id="title" class="form-control" placeholder="이름을 입력하세요."
                            th:field="*{title}" th:errorclass="border-danger"/>
                     <p class="text-danger" th:errors="*{title}"></p>
                 </div>
@@ -74,10 +74,10 @@
                 </div>
 
                 <div class="d-flex justify-content-center">
-                    <button type="submit" class="btn btn-primary" style="width: 10%;"
+                    <button type="submit" class="btn btn-primary" style="width: 10%; background-color: #CB8BFF; border: none;"
                             th:text="${createButtonName}">추가
                     </button>
-                    <a class="btn btn-danger ms-3" style="width: 10%;"
+                    <a class="btn btn-danger ms-3" style="width: 10%; background-color: #CDCDCD; border: none;"
                        th:text="${cancelButtonName}" th:href="@{/boards}">취소</a>
                 </div>
             </form>
