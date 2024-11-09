@@ -1,10 +1,12 @@
 package com.elice.artBoard.post.controller;
 
+import com.elice.artBoard.board.domain.Board;
 import com.elice.artBoard.post.entity.Post;
 import com.elice.artBoard.post.entity.PostImage;
 import com.elice.artBoard.post.entity.PostPostDto;
 import com.elice.artBoard.post.entity.PostResponseDto;
 import com.elice.artBoard.post.service.PostService;
+import com.elice.artBoard.board.service.BoardService;
 import com.elice.artBoard.post.service.PostImageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,13 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
-
-import static com.elice.artBoard.post.constants.DefaultImgConst.DEFAULT_IMG_PATH;
 
 @Slf4j
 @Controller
@@ -38,19 +34,22 @@ public class PostController {
 
     private final PostService postService;
     private final PostImageService postImageService;
+    private final BoardService boardService;
 
     @Autowired
-    public PostController(PostService postService, PostImageService postImageService) {
+    public PostController(PostService postService, PostImageService postImageService, BoardService boardService) {
         this.postService = postService;
         this.postImageService = postImageService;
+        this.boardService = boardService;
     }
 
     // 게시글 목록 페이지
     @GetMapping
-    public String getAllPosts(Model model) {
-        List<Post> posts = postService.getAllPosts();
-
+    public String getAllPosts(@RequestParam Long boardId, Model model) {
+        // boardId를 파라미터로 받아옵니다.
+        List<Post> posts = postService.findPostsByBoardId(boardId);  // boardId에 해당하는 게시글을 가져옵니다.
         model.addAttribute("posts", posts);
+        model.addAttribute("boardId", boardId);  // boardId를 모델에 추가
 
         return "post/list";
     }
@@ -73,28 +72,44 @@ public class PostController {
 
     // 게시글 생성 페이지
     @GetMapping("/create")
-    public String createPostForm(Model model) {
-        model.addAttribute("postPostDto", new PostPostDto());
-
+    public String createPostForm(@RequestParam("boardId") Long boardId, Model model) {
+        System.out.println("Received boardId: " + boardId);  // 디버깅 로그
+        PostPostDto postPostDto = new PostPostDto();
+        postPostDto.setBoardId(boardId);  // DTO에 boardId 설정
+        model.addAttribute("postPostDto", postPostDto);
+        if (boardId != null) {
+            model.addAttribute("boardId", boardId);
+        } else {
+            model.addAttribute("boardId", 2);  // 기본값 설정
+        }
         return "post/create";
     }
 
     // 게시글 생성 처리
-    @PostMapping
-    public String createPost(@Validated @ModelAttribute("postPostDto") PostPostDto postPostDto) {
-        Post post = postService.save(postPostDto);
+    @PostMapping("/create")
+    public String createPost(@Validated @ModelAttribute("postPostDto") PostPostDto postPostDto,
+                             @RequestParam("boardId") Long boardId) {
+        Post post = postService.save(postPostDto, boardId);
         postImageService.save(postPostDto, post);
-        return "redirect:/posts";
+        return "redirect:/boards/board/" + boardId;
     }
 
     // 게시글 수정 페이지
     @GetMapping("/{postId}/edit")
     public String editPostForm(@PathVariable Long postId, Model model) {
+        // 게시글 조회
         Post post = postService.getPost(postId);
-        PostPostDto postPostDto = new PostPostDto(post.getTitle(), post.getContent(), null);
-        model.addAttribute("postPostDto", postPostDto); // DTO를 모델에 추가
 
-        return "post/edit";
+        // 게시판 ID를 얻는 방법 (Post에서 Board를 참조하고 있다고 가정)
+        Long boardId = post.getBoard().getId();  // Post 객체가 Board를 참조한다고 가정
+
+        // PostPostDto 생성
+        PostPostDto postPostDto = new PostPostDto(post.getTitle(), post.getContent(), boardId);
+
+        // 모델에 DTO와 boardId를 추가
+        model.addAttribute("postPostDto", postPostDto);
+
+        return "post/edit";  // 게시글 수정 폼 페이지로 이동
     }
 
     // 게시글 수정 처리
@@ -107,16 +122,24 @@ public class PostController {
         Post post = postService.update(postId, postPostDto);
         postImageService.update(post, postPostDto);
 
-
-        return "redirect:/posts";
+        return "redirect:/boards/board/" + postPostDto.getBoardId();
     }
 
     // 특정 게시글 삭제
     @PostMapping("/{postId}/delete")
     public String deletePost(@PathVariable Long postId) {
+        // 게시글을 삭제하기 전에 해당 게시글의 boardId를 가져옵니다.
+        Post post = postService.getPost(postId);
+        Long boardId = post.getBoard().getId();  // 게시글이 속한 게시판 ID를 가져옵니다.
+
+        // 이미지 삭제 (게시글에 연결된 이미지가 있다면 삭제)
         postImageService.delete(postId);
+
+        // 게시글 삭제
         postService.deletePost(postId);
-        return "redirect:/posts";
+
+        // 리디렉션 URL에서 boardId를 경로 변수로 전달
+        return "redirect:/boards/board/" + boardId;
     }
 
     @ResponseBody
@@ -127,50 +150,15 @@ public class PostController {
         return getResponse(image);
     }
 
-
-
-    private List<PostResponseDto> getPostResponseDtoList(List<Post> posts, List<PostImage> images) {
-        List<PostResponseDto> responseDtoList = new ArrayList<>();
-        int bound = posts.size();
-
-        // 게시글과 이미지 정보를 결합하여 PostResponseDto 객체 생성
-        IntStream.range(0, bound).forEach(i -> {
-            Post post = posts.get(i);
-            PostImage postImage = images.get(i);  // 해당 게시글에 연결된 이미지
-
-            // PostResponseDto에 게시글 정보와 이미지 ID를 담습니다.
-            responseDtoList.add(new PostResponseDto(
-                    post.getId(),
-                    post.getTitle(),
-                    post.getContent(),
-                    post.getCreatedAt(),
-                    post.getEditedAt(),
-                    post.getMemberId(),
-                    post.getBoardId(),
-                    postImage.getId()  // 이미지 ID를 포함
-            ));
-        });
-
-        return responseDtoList;
-    }
-
     private ResponseEntity getResponse(PostImage image) throws MalformedURLException {
         Resource resource;
 
-        if (image.getImagePath().equals(DEFAULT_IMG_PATH)) {
-            resource = new ClassPathResource(DEFAULT_IMG_PATH);
-
-        } else {
-            resource = new UrlResource("file:" + image.getImagePath());
-        }
+        resource = new UrlResource("file:" + image.getImagePath());
 
         return ResponseEntity.ok()
                 .contentType(MediaType.IMAGE_JPEG)
                 .contentType(MediaType.IMAGE_PNG)
                 .body(resource);
     }
-
-
-
 
 }

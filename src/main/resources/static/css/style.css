@@ -1,0 +1,15 @@
+.custom-button {
+            color: white;
+            background-color: #CB8BFF;
+            font-weight: bold;
+        }
+
+        .custom-button:hover {
+            background-color: #c491f5;
+        }
+
+        .form-control::placeholder {
+            text-align: center; /* 중앙 정렬 */
+            color: #888; /* 더 보기 좋은 색상 */
+            font-weight: 500; /* 약간 더 굵게 */
+        }
