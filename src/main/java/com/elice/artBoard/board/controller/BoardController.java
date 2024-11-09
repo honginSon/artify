@@ -103,7 +103,7 @@ public class BoardController {
     }
 
     // 게시글 연결
-    @GetMapping("/board/{boardId}")
+    @GetMapping("/{boardId}")
     public String getBoard(@PathVariable Long boardId, Model model) {
         // boardId를 사용하여 해당 게시판에 연결된 게시글 목록을 가져옴
         List<Post> posts = postService.findPostsByBoardId(boardId);  // 게시판에 해당하는 게시글 목록을 가져오는 메서드
