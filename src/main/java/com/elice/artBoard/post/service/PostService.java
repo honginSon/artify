@@ -1,12 +1,11 @@
 package com.elice.artBoard.post.service;
 
-import com.elice.artBoard.board.repository.BoardRepository;
 import com.elice.artBoard.board.domain.Board;
+import com.elice.artBoard.board.repository.BoardRepository;
 import com.elice.artBoard.comment.repository.CommentRepository;
 import com.elice.artBoard.post.entity.Post;
 import com.elice.artBoard.post.entity.PostPostDto;
 import com.elice.artBoard.post.repository.PostRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,6 +37,11 @@ public class PostService {
     public Post getPost(Long postId) {
         return postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("Post not found"));
+    }
+
+    //board와 연관된 게시글 조회
+    public Post getPostByBoardId(Long boardId) {
+        return postRepository.findOneByBoardId(boardId);
     }
 
     // 게시글 저장

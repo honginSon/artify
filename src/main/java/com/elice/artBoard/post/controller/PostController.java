@@ -1,20 +1,14 @@
 package com.elice.artBoard.post.controller;
 
-import com.elice.artBoard.board.domain.Board;
-import com.elice.artBoard.comment.domain.Comment;
-import com.elice.artBoard.comment.dto.ResponseCommentDto;
+import com.elice.artBoard.board.service.BoardService;
 import com.elice.artBoard.comment.service.CommentService;
 import com.elice.artBoard.post.entity.Post;
 import com.elice.artBoard.post.entity.PostImage;
 import com.elice.artBoard.post.entity.PostPostDto;
-import com.elice.artBoard.post.entity.PostResponseDto;
-import com.elice.artBoard.post.service.PostService;
-import com.elice.artBoard.board.service.BoardService;
 import com.elice.artBoard.post.service.PostImageService;
-import lombok.RequiredArgsConstructor;
+import com.elice.artBoard.post.service.PostService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.MediaType;
@@ -26,9 +20,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.MalformedURLException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.IntStream;
 
 @Slf4j
 @Controller
@@ -101,7 +93,7 @@ public class PostController {
                              @RequestParam("boardId") Long boardId) {
         Post post = postService.save(postPostDto, boardId);
         postImageService.save(postPostDto, post);
-        return "redirect:/boards/board/" + boardId;
+        return "redirect:/boards/" + boardId;
     }
 
     // 게시글 수정 페이지

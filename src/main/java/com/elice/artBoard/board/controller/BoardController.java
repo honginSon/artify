@@ -119,16 +119,16 @@ public class BoardController {
 
     private List<ResponseBoardForm> getResponseFormList(List<Board> boards, List<BoardImage> images) {
 
-        List<ResponseBoardForm> forms = new ArrayList<>();
+        List<ResponseBoardForm> formList = new ArrayList<>();
         int bound = boards.size();
 
         IntStream.range(0, bound).forEach(i -> {
             Board board = boards.get(i);
             BoardImage boardImage = images.get(i);
-            forms.add(new ResponseBoardForm(board.getId(), board.getTitle(), board.getDescription(), boardImage.getId()));
+            formList.add(new ResponseBoardForm(board.getId(), board.getTitle(), board.getDescription(), boardImage.getId()));
         });
 
-        return forms;
+        return formList;
     }
 
     private ResponseEntity getResponse(BoardImage image) throws MalformedURLException {
