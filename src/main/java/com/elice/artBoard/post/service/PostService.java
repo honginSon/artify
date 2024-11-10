@@ -2,6 +2,7 @@ package com.elice.artBoard.post.service;
 
 import com.elice.artBoard.board.repository.BoardRepository;
 import com.elice.artBoard.board.domain.Board;
+import com.elice.artBoard.comment.repository.CommentRepository;
 import com.elice.artBoard.post.entity.Post;
 import com.elice.artBoard.post.entity.PostPostDto;
 import com.elice.artBoard.post.repository.PostRepository;
@@ -19,11 +20,13 @@ import java.util.List;
 public class PostService {
     private final PostRepository postRepository;
     private final BoardRepository boardRepository;
+    private final CommentRepository commentRepository;
 
     @Autowired
-    public PostService(PostRepository postRepository, BoardRepository boardRepository) {
+    public PostService(PostRepository postRepository, BoardRepository boardRepository, CommentRepository commentRepository) {
         this.postRepository = postRepository;
         this.boardRepository = boardRepository;
+        this.commentRepository = commentRepository;
     }
 
     // 모든 게시글 조회
@@ -53,6 +56,9 @@ public class PostService {
     // 특정 게시글 삭제
     public void deletePost(Long postId) {
         Post post = postRepository.findById(postId).orElseThrow(() -> new RuntimeException("Post not found"));
+
+        //댓글에 게시글 fk가 있음으로 댓글 먼저 삭제
+        commentRepository.deleteByPostId(postId);
         postRepository.delete(post);
     }
 

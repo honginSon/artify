@@ -149,7 +149,7 @@ public class PostController {
         postService.deletePost(postId);
 
         // 리디렉션 URL에서 boardId를 경로 변수로 전달
-        return "redirect:/boards/board/" + boardId;
+        return "redirect:/boards/" + boardId;
     }
 
     @ResponseBody
