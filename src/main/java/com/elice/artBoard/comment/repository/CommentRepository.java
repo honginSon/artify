@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class CommentRepository {
@@ -20,16 +21,16 @@ public class CommentRepository {
         return comment;
     }
 
-    public Comment findById(Long commentId) {
-        return em.find(Comment.class, commentId);
+    public Optional<Comment> findById(Long commentId) {
+        Comment comment = em.find(Comment.class, commentId);
+        return Optional.ofNullable(comment);
     }
 
-    public List<Comment> findAll(Long commentId) {
+    public List<Comment> findAll(Long postId) {
         return em.createQuery("select c from Comment c " +
-                        "join fetch c.post " +
-                        "join fetch c.member " +
-                        "where c.id = :commentId", Comment.class)
-                .setParameter("commentId", commentId)
+                        "join fetch c.post p " +
+                        "where p.id = :postId", Comment.class)
+                .setParameter("postId", postId)
                 .getResultList();
     }
 

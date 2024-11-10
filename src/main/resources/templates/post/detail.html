@@ -13,7 +13,7 @@
 </div>
 <div class="d-flex justify-content-center">
     <div class="container">
-<!--        <h1>게시글 상세</h1>-->
+        <!--        <h1>게시글 상세</h1>-->
         <h2 th:text="${post.title}"></h2>
         <div class="d-flex justify-content-end">
             <p>작성일: <span th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}"></span></p>
@@ -32,28 +32,122 @@
         <div class="border p-3">
             <p th:text="${post.content}"></p>
         </div>
-<!--        <p>작성일: <span th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}"></span></p>-->
-<!--        <p>수정일: <span th:text="${#temporals.format(post.editedAt, 'yyyy-MM-dd HH:mm')}"></span></p>-->
+        <!--        <p>작성일: <span th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}"></span></p>-->
+        <!--        <p>수정일: <span th:text="${#temporals.format(post.editedAt, 'yyyy-MM-dd HH:mm')}"></span></p>-->
 
         <br>
         <div class="d-flex justify-content-center">
-            <a class="btn btn-primary" th:href="@{/posts/{postId}/edit(postId=${post.id})}" style="width: 10%; background-color: #CB8BFF; color: white; border: none;">수정</a>
-            <form th:action="@{/posts/{postId}/delete(postId=${post.id})}" method="post" style="display:flex; width: 10%" onsubmit="return confirmDelete()">
-                <button type="submit" class="btn btn-danger flex-grow-1 mx-1 ms-3" style="background-color: #CDCDCD; color: white; border: none;">
+            <a class="btn btn-primary" th:href="@{/posts/{postId}/edit(postId=${post.id})}"
+               style="width: 10%; background-color: #CB8BFF; color: white; border: none;">수정</a>
+            <form th:action="@{/posts/{postId}/delete(postId=${post.id})}" method="post"
+                  style="display:flex; width: 10%" onsubmit="return confirmDelete()">
+                <button type="submit" class="btn btn-danger flex-grow-1 mx-1 ms-3"
+                        style="background-color: #CDCDCD; color: white; border: none;">
                     삭제
                 </button>
             </form>
         </div>
-<!--        -->
-<!--        <br><br>-->
-<!--        <a href="/posts">게시글 목록</a>-->
+        <!--        -->
+        <!--        <br><br>-->
+        <!--        <a href="/posts">게시글 목록</a>-->
     </div>
 </div>
-    <!-- 삭제 확인을 위한 JavaScript 함수 -->
-    <script>
-        function confirmDelete() {
-            return confirm("정말로 삭제하시겠습니까?");
+
+<!-- 댓글 list -->
+<div class="container">
+    <h2 class="mb-3">댓글</h2>
+    <table class="table mb-5" style="table-layout: fixed;">
+        <tbody th:each="comment : ${comments}">
+        <tr style="vertical-align: middle" th:id="|comment-${comment.getCommentId()}|">
+            <td th:text="${commentStat.count}"></td>
+            <td class="text-center" style="vertical-align: middle" th:text="${#temporals.format(comment.getCreateDate(), 'yyyy-MM-dd')}"></td>
+            <td class="text-wrap text-center" style="width: 300px; word-break: break-all;"
+                th:text="${comment.getContent()}"></td>
+            <td class="text-center" style="vertical-align: middle" th:text="${comment.getMemberId()}"></td>
+            <td class="text-center" style="vertical-align: middle">
+                <button class="btn btn-primary ms-3" style="background-color: #CB8BFF; color: white; border: none;"
+                        th:onclick="|edit([[${comment.getCommentId()}]], [[${post.getId()}]])|">수정</button>
+                <button class="btn btn-danger ms-3" style="background-color: #CDCDCD; color: white; border: none;"
+                th:onclick="|deleteComment([[${comment.getCommentId()}]])|">삭제</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- 댓글 추가 -->
+<div class="container">
+    <h2 class="mb-3">댓글 추가</h2>
+    <form th:action="@{/comments/create}" method="post">
+        <input type="hidden" name="postId" th:value="${post.getId()}">
+        <textarea style="height: 200px; resize: none" class="form-control" id="content" name="content"></textarea>
+        <button class="btn mt-3" style="width: 10%; background-color: #CB8BFF; color: white; border: none;"
+                type="submit">추가
+        </button>
+    </form>
+</div>
+
+
+<script th:inline="javascript">
+
+    // 댓글 수정 클릭시 form 추가 javascript
+    function edit(commentId, postId) {
+
+        const commentRow = document.querySelector(`#comment-${commentId}`);
+        const editForm = document.querySelector(`#comment-edit-${commentId}`);
+
+        if (editForm) {
+            removeForm(commentId);
+            return;
         }
-    </script>
+
+        const newRow = document.createElement('tr');
+
+        newRow.innerHTML = `
+    <td style="border-color: white">
+        <form method="post" action="/comments/edit/${commentId}" id="comment-edit-${commentId}">
+            <input type="hidden" name="_method" value="put">
+            <input type="hidden" name="commentId" value="${commentId}">
+            <input type="hidden" name="postId" value="${postId}">
+            <textarea class="form-control mb-3" style="height: 120px; width: 800px; resize: none" name="content"></textarea>
+            <button class="btn btn-sm" type="submit" style="background-color: #CB8BFF; color: white; border: none;">수정</button>
+            <button class="btn btn-sm btn-danger" onclick="removeForm(${commentId})">취소</button>
+        </form>
+    </td>`;
+        commentRow.insertAdjacentElement('afterend', newRow);
+    }
+
+    //삭제 버튼을 눌르면 form 생성후 summit
+    function deleteComment(commentId) {
+        let form = document.createElement('form');
+        form.setAttribute("method", "post");
+        form.setAttribute("action", "/comments/delete/" + commentId);
+
+        let hiddenMethodField = document.createElement('input');
+        hiddenMethodField.setAttribute("type", "hidden");
+        hiddenMethodField.setAttribute("name", "_method");
+        hiddenMethodField.setAttribute("value", "delete");
+
+        // 폼에 히든 필드 추가
+        form.appendChild(hiddenMethodField);
+
+        if (confirmDelete()) {
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+
+    // 댓글 수정 form에서 취소를 누를 시 remove
+    function removeForm(commentId) {
+        const editForm = document.querySelector(`#comment-edit-${commentId}`).closest('tr');
+        editForm.remove();
+    }
+
+    // 삭제 확인을 위한 JavaScript 함수
+
+    function confirmDelete() {
+        return confirm("정말로 삭제하시겠습니까?");
+    }
+</script>
 </body>
 </html>

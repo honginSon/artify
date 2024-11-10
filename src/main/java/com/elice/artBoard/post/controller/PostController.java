@@ -1,6 +1,9 @@
 package com.elice.artBoard.post.controller;
 
 import com.elice.artBoard.board.domain.Board;
+import com.elice.artBoard.comment.domain.Comment;
+import com.elice.artBoard.comment.dto.ResponseCommentDto;
+import com.elice.artBoard.comment.service.CommentService;
 import com.elice.artBoard.post.entity.Post;
 import com.elice.artBoard.post.entity.PostImage;
 import com.elice.artBoard.post.entity.PostPostDto;
@@ -36,11 +39,15 @@ public class PostController {
     private final PostImageService postImageService;
     private final BoardService boardService;
 
+    //CommentService 추가
+    private final CommentService commentService;
+
     @Autowired
-    public PostController(PostService postService, PostImageService postImageService, BoardService boardService) {
+    public PostController(PostService postService, PostImageService postImageService, BoardService boardService, CommentService commentService) {
         this.postService = postService;
         this.postImageService = postImageService;
         this.boardService = boardService;
+        this.commentService = commentService;
     }
 
     // 게시글 목록 페이지
@@ -66,6 +73,9 @@ public class PostController {
         } else {
             model.addAttribute("imageId", null);  // 이미지가 없으면 null로 설정
         }
+
+        //댓글 model에 추가
+        model.addAttribute("comments", commentService.findComments(postId));
 
         return "post/detail";  // 게시글 상세 페이지로 이동
     }
