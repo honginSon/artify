@@ -7,6 +7,8 @@ import com.elice.artBoard.post.entity.PostImage;
 import com.elice.artBoard.post.entity.PostPostDto;
 import com.elice.artBoard.post.service.PostImageService;
 import com.elice.artBoard.post.service.PostService;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -24,23 +26,14 @@ import java.util.List;
 
 @Slf4j
 @Controller
+@RequiredArgsConstructor
 @RequestMapping("/posts")
 public class PostController {
 
     private final PostService postService;
     private final PostImageService postImageService;
     private final BoardService boardService;
-
-    //CommentService 추가
-    private final CommentService commentService;
-
-    @Autowired
-    public PostController(PostService postService, PostImageService postImageService, BoardService boardService, CommentService commentService) {
-        this.postService = postService;
-        this.postImageService = postImageService;
-        this.boardService = boardService;
-        this.commentService = commentService;
-    }
+    private final CommentService commentService; //CommentService 추가
 
     // 게시글 목록 페이지
     @GetMapping
@@ -80,11 +73,8 @@ public class PostController {
         PostPostDto postPostDto = new PostPostDto();
         postPostDto.setBoardId(boardId);  // DTO에 boardId 설정
         model.addAttribute("postPostDto", postPostDto);
-        if (boardId != null) {
-            model.addAttribute("boardId", boardId);
-        } else {
-            model.addAttribute("boardId", 2);  // 기본값 설정
-        }
+        model.addAttribute("boardId", boardId);
+
         return "post/create";
     }
 
