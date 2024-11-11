@@ -1,17 +1,14 @@
 package com.elice.artBoard.post.controller;
 
-import com.elice.artBoard.board.domain.Board;
+import com.elice.artBoard.board.service.BoardService;
+import com.elice.artBoard.comment.service.CommentService;
 import com.elice.artBoard.post.entity.Post;
 import com.elice.artBoard.post.entity.PostImage;
 import com.elice.artBoard.post.entity.PostPostDto;
-import com.elice.artBoard.post.entity.PostResponseDto;
-import com.elice.artBoard.post.service.PostService;
-import com.elice.artBoard.board.service.BoardService;
 import com.elice.artBoard.post.service.PostImageService;
-import lombok.RequiredArgsConstructor;
+import com.elice.artBoard.post.service.PostService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.MediaType;
@@ -23,9 +20,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.MalformedURLException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.IntStream;
 
 @Slf4j
 @Controller
@@ -36,11 +31,15 @@ public class PostController {
     private final PostImageService postImageService;
     private final BoardService boardService;
 
+    //CommentService 추가
+    private final CommentService commentService;
+
     @Autowired
-    public PostController(PostService postService, PostImageService postImageService, BoardService boardService) {
+    public PostController(PostService postService, PostImageService postImageService, BoardService boardService, CommentService commentService) {
         this.postService = postService;
         this.postImageService = postImageService;
         this.boardService = boardService;
+        this.commentService = commentService;
     }
 
     // 게시글 목록 페이지
@@ -67,6 +66,9 @@ public class PostController {
             model.addAttribute("imageId", null);  // 이미지가 없으면 null로 설정
         }
 
+        //댓글 model에 추가
+        model.addAttribute("comments", commentService.findComments(postId));
+
         return "post/detail";  // 게시글 상세 페이지로 이동
     }
 
@@ -91,7 +93,7 @@ public class PostController {
                              @RequestParam("boardId") Long boardId) {
         Post post = postService.save(postPostDto, boardId);
         postImageService.save(postPostDto, post);
-        return "redirect:/boards/board/" + boardId;
+        return "redirect:/boards/" + boardId;
     }
 
     // 게시글 수정 페이지
@@ -122,7 +124,7 @@ public class PostController {
         Post post = postService.update(postId, postPostDto);
         postImageService.update(post, postPostDto);
 
-        return "redirect:/boards/board/" + postPostDto.getBoardId();
+        return "redirect:/boards/" + postPostDto.getBoardId();
     }
 
     // 특정 게시글 삭제
@@ -139,7 +141,7 @@ public class PostController {
         postService.deletePost(postId);
 
         // 리디렉션 URL에서 boardId를 경로 변수로 전달
-        return "redirect:/boards/board/" + boardId;
+        return "redirect:/boards/" + boardId;
     }
 
     @ResponseBody
