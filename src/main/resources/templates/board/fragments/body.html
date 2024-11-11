@@ -35,7 +35,7 @@
                                     <a class="btn btn-outline-primary me-2"
                                        th:href="@{boards/put/{id}(id=${form.getBoardId()})}" th:text="'수정'"></a>
                                     <a class="btn btn-outline-danger" onclick="return confirmDelete(event, this);"
-                                       th:href="@{boards/delete/{id}(id=${form.getBoardId()})}" th:text="'삭제'"></a>
+                                       th:onclick="|deleteBoard(${form.getBoardId()})|" th:text="'삭제'"></a>
                                 </div>
                             </div>
                         </div>
@@ -45,6 +45,25 @@
             </div>
         </div>
     </div>
+    <script>
+        function deleteBoard(boardId) {
+            let form = document.createElement('form');
+            form.setAttribute('method', 'post');
+            form.setAttribute('action', 'boards/delete/' + boardId);
+
+            let hiddenMethodField = document.createElement('input');
+            hiddenMethodField.setAttribute("type", "hidden");
+            hiddenMethodField.setAttribute("name", "_method");
+            hiddenMethodField.setAttribute("value", "delete");
+
+            form.appendChild(hiddenMethodField);
+
+            if (confirm("정말 삭제하시겠습니까?")) {
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+    </script>
 </th:block>
 
 <!-- 게시판 업로드 및 수정 부분 -->
