@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      lang="en">
+<head th:replace="~{board/fragments/header :: header}">
+</head>
+<body>
+<th:block th:insert="~{board/fragments/body :: header}"></th:block>
+<th:block th:insert="~{board/fragments/body :: listForm}"></th:block>
+</body>
+</html>
