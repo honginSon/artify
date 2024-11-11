@@ -124,7 +124,7 @@ public class PostController {
         Post post = postService.update(postId, postPostDto);
         postImageService.update(post, postPostDto);
 
-        return "redirect:/boards/board/" + postPostDto.getBoardId();
+        return "redirect:/boards/" + postPostDto.getBoardId();
     }
 
     // 특정 게시글 삭제
