@@ -5,6 +5,7 @@ import com.elice.artBoard.board.domain.Board;
 import com.elice.artBoard.post.entity.Post;
 import com.elice.artBoard.post.entity.PostPostDto;
 import com.elice.artBoard.post.repository.PostRepository;
+import com.elice.artBoard.post.service.PostImageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,20 +16,16 @@ import java.util.List;
 
 @Slf4j
 @Transactional
+@RequiredArgsConstructor
 @Service
 public class PostService {
     private final PostRepository postRepository;
     private final BoardRepository boardRepository;
-
-    @Autowired
-    public PostService(PostRepository postRepository, BoardRepository boardRepository) {
-        this.postRepository = postRepository;
-        this.boardRepository = boardRepository;
-    }
+    private final PostImageService postImageService;
 
     // 모든 게시글 조회
-    public List<Post> getAllPosts() {
-        return postRepository.findAll();
+    public List<Post> findPostsByBoardId(Long boardId) {
+        return postRepository.findByBoardId(boardId);  // Board와 연결된 게시글 조회
     }
 
     // 특정 게시글 조회
@@ -53,11 +50,14 @@ public class PostService {
     // 특정 게시글 삭제
     public void deletePost(Long postId) {
         Post post = postRepository.findById(postId).orElseThrow(() -> new RuntimeException("Post not found"));
+        postImageService.delete(postId);
         postRepository.delete(post);
     }
 
-    public List<Post> findPostsByBoardId(Long boardId) {
-        return postRepository.findByBoardId(boardId);  // Board와 연결된 게시글 조회
+    public PostPostDto getPostPostDto(Long postId) {
+        Post post = getPost(postId);  // 게시글 조회
+        Long boardId = post.getBoard().getId();  // 게시판 ID 추출
+        return new PostPostDto(post.getTitle(), post.getContent(), boardId);
     }
 
 }
