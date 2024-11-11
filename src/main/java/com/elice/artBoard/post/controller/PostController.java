@@ -1,13 +1,14 @@
 package com.elice.artBoard.post.controller;
 
+import com.elice.artBoard.board.service.BoardService;
+import com.elice.artBoard.comment.service.CommentService;
 import com.elice.artBoard.post.entity.Post;
 import com.elice.artBoard.post.entity.PostImage;
 import com.elice.artBoard.post.entity.PostPostDto;
-import com.elice.artBoard.post.service.PostService;
-import com.elice.artBoard.board.service.BoardService;
 import com.elice.artBoard.post.service.PostImageService;
-import lombok.RequiredArgsConstructor;
+import com.elice.artBoard.post.service.PostService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.MediaType;
@@ -23,13 +24,23 @@ import java.util.List;
 
 @Slf4j
 @Controller
-@RequiredArgsConstructor
 @RequestMapping("/posts")
 public class PostController {
 
     private final PostService postService;
     private final PostImageService postImageService;
     private final BoardService boardService;
+
+    //CommentService 추가
+    private final CommentService commentService;
+
+    @Autowired
+    public PostController(PostService postService, PostImageService postImageService, BoardService boardService, CommentService commentService) {
+        this.postService = postService;
+        this.postImageService = postImageService;
+        this.boardService = boardService;
+        this.commentService = commentService;
+    }
 
     // 게시글 목록 페이지
     @GetMapping
@@ -55,6 +66,9 @@ public class PostController {
             model.addAttribute("imageId", null);  // 이미지가 없으면 null로 설정
         }
 
+        //댓글 model에 추가
+        model.addAttribute("comments", commentService.findComments(postId));
+
         return "post/detail";  // 게시글 상세 페이지로 이동
     }
 
@@ -65,8 +79,11 @@ public class PostController {
         PostPostDto postPostDto = new PostPostDto();
         postPostDto.setBoardId(boardId);  // DTO에 boardId 설정
         model.addAttribute("postPostDto", postPostDto);
-        model.addAttribute("boardId", boardId);
-
+        if (boardId != null) {
+            model.addAttribute("boardId", boardId);
+        } else {
+            model.addAttribute("boardId", 2);  // 기본값 설정
+        }
         return "post/create";
     }
 
@@ -76,16 +93,22 @@ public class PostController {
                              @RequestParam("boardId") Long boardId) {
         Post post = postService.save(postPostDto, boardId);
         postImageService.save(postPostDto, post);
-        return "redirect:/boards/board/" + boardId;
+        return "redirect:/boards/" + boardId;
     }
 
     // 게시글 수정 페이지
     @GetMapping("/{postId}/edit")
     public String editPostForm(@PathVariable Long postId, Model model) {
-        // PostPostDto 객체를 Service에서 받아옴
-        PostPostDto postPostDto = postService.getPostPostDto(postId);
+        // 게시글 조회
+        Post post = postService.getPost(postId);
 
-        // model에 담아서 뷰로 전달
+        // 게시판 ID를 얻는 방법 (Post에서 Board를 참조하고 있다고 가정)
+        Long boardId = post.getBoard().getId();  // Post 객체가 Board를 참조한다고 가정
+
+        // PostPostDto 생성
+        PostPostDto postPostDto = new PostPostDto(post.getTitle(), post.getContent(), boardId);
+
+        // 모델에 DTO와 boardId를 추가
         model.addAttribute("postPostDto", postPostDto);
 
         return "post/edit";  // 게시글 수정 폼 페이지로 이동
@@ -101,20 +124,24 @@ public class PostController {
         Post post = postService.update(postId, postPostDto);
         postImageService.update(post, postPostDto);
 
-        return "redirect:/boards/board/" + postPostDto.getBoardId();
+        return "redirect:/boards/" + postPostDto.getBoardId();
     }
 
     // 특정 게시글 삭제
     @PostMapping("/{postId}/delete")
     public String deletePost(@PathVariable Long postId) {
+        // 게시글을 삭제하기 전에 해당 게시글의 boardId를 가져옵니다.
         Post post = postService.getPost(postId);
         Long boardId = post.getBoard().getId();  // 게시글이 속한 게시판 ID를 가져옵니다.
+
+        // 이미지 삭제 (게시글에 연결된 이미지가 있다면 삭제)
+        postImageService.delete(postId);
 
         // 게시글 삭제
         postService.deletePost(postId);
 
         // 리디렉션 URL에서 boardId를 경로 변수로 전달
-        return "redirect:/boards/board/" + boardId;
+        return "redirect:/boards/" + boardId;
     }
 
     @ResponseBody

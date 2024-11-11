@@ -67,17 +67,18 @@ public class BoardImageService {
 
     public List<BoardImage> findImagesByBoardId(List<Board> boards) {
         return boards.stream()
-                .map(board -> {
-                    return findByBordId(board.getId());
-                }).toList();
+                .map(board -> findByBordId(board.getId())).toList();
     }
 
     public BoardImage findByImgId(Long boardImageId) {
-        return boardImageRepository.findById(boardImageId).get();
+        return boardImageRepository.findById(boardImageId)
+                .orElseThrow(() -> new IllegalArgumentException("일치하는 사진이 없습니다"));
     }
 
     public BoardImage findByBordId(Long bordId) {
-        return boardImageRepository.findByBoardId(bordId).get();
+        return boardImageRepository.findByBoardId(bordId)
+                .orElseThrow(() -> new IllegalArgumentException("일치하는 게시물이 없습니다"));
+
     }
 
     private String getImagePath(String originalFilename) {

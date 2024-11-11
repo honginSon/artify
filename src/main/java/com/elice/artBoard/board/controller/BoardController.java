@@ -3,11 +3,10 @@ package com.elice.artBoard.board.controller;
 import com.elice.artBoard.board.domain.Board;
 import com.elice.artBoard.board.domain.BoardImage;
 import com.elice.artBoard.board.dto.RequestBoardForm;
-import com.elice.artBoard.board.dto.ResponseBoardForm;
 import com.elice.artBoard.board.service.BoardImageService;
 import com.elice.artBoard.board.service.BoardService;
-import com.elice.artBoard.post.service.PostService;
 import com.elice.artBoard.post.entity.Post;
+import com.elice.artBoard.post.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
@@ -22,9 +21,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.MalformedURLException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.IntStream;
 
 import static com.elice.artBoard.board.constants.DefaultImgConst.DEFAULT_IMG_PATH;
 
@@ -41,12 +38,7 @@ public class BoardController {
 
     @GetMapping
     public String boardList(Model model) {
-
-        List<Board> boards = boardService.findBoards();
-        List<BoardImage> images = boardImageService.findImagesByBoardId(boards);
-
-        List<ResponseBoardForm> responseBoardForm = getResponseFormList(boards, images);
-        model.addAttribute("list", responseBoardForm);
+        model.addAttribute("list", boardService.findBoardsAndImages());
         return "/board/boards";
     }
 
@@ -87,7 +79,7 @@ public class BoardController {
         return "redirect:/boards";
     }
 
-    @GetMapping("/delete/{boardId}")
+    @DeleteMapping("/delete/{boardId}")
     public String deleteBoard(@PathVariable Long boardId) {
         boardImageService.delete(boardId);
         boardService.delete(boardId);
@@ -103,7 +95,7 @@ public class BoardController {
     }
 
     // 게시글 연결
-    @GetMapping("/board/{boardId}")
+    @GetMapping("/{boardId}")
     public String getBoard(@PathVariable Long boardId, Model model) {
         // boardId를 사용하여 해당 게시판에 연결된 게시글 목록을 가져옴
         List<Post> posts = postService.findPostsByBoardId(boardId);  // 게시판에 해당하는 게시글 목록을 가져오는 메서드
@@ -113,22 +105,6 @@ public class BoardController {
 
         // 게시판 상세 페이지 대신 게시글 목록 페이지로 이동
         return "post/list";  // 게시판에 속한 게시글 목록을 보여주는 뷰로 이동
-    }
-
-
-
-    private List<ResponseBoardForm> getResponseFormList(List<Board> boards, List<BoardImage> images) {
-
-        List<ResponseBoardForm> forms = new ArrayList<>();
-        int bound = boards.size();
-
-        IntStream.range(0, bound).forEach(i -> {
-            Board board = boards.get(i);
-            BoardImage boardImage = images.get(i);
-            forms.add(new ResponseBoardForm(board.getId(), board.getTitle(), board.getDescription(), boardImage.getId()));
-        });
-
-        return forms;
     }
 
     private ResponseEntity getResponse(BoardImage image) throws MalformedURLException {
