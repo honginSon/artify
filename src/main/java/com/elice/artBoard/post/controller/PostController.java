@@ -60,6 +60,7 @@ public class PostController {
         PostImage postImage = postImageService.findImageByPostId(post);  // 게시글에 연결된 이미지 찾기
 
         model.addAttribute("post", post);
+        model.addAttribute("boardId", post.getBoard().getId());
         if (postImage != null) {
             model.addAttribute("imageId", postImage.getId());  // 이미지 ID를 모델에 추가
         } else {

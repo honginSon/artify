@@ -69,7 +69,7 @@
     <div class="d-flex justify-content-center mt-5">
         <img th:src="@{/images/logo.png}" alt="Logo"/>
     </div>
-
+    <button class="btn btn-sm btn-outline-secondary" type="button" onclick="window.location.href='/boards'" style="margin-left: 16px;">&lt; 게시판 목록</button>
     <!-- Title and Create Post Button -->
     <div class="d-flex justify-content-between m-3">
         <h2 class="text-center mt-3">게시글 목록</h2>
@@ -91,7 +91,7 @@
                 <tr th:each="post : ${posts}">
                     <!-- 제목을 클릭하면 해당 게시물의 상세 페이지로 이동 -->
                     <td><a class="d-inline-block text-truncate" style="max-width: 200px;" th:href="@{/posts/{postId}(postId=${post.id})}" th:text="${post.title}"></a></td>
-                    <td class="d-inline-block text-truncate" style="max-width: 500px;" th:text="${post.content}"></td>
+                    <td class="d-inline-block text-truncate" style="max-width: 600px;" th:text="${post.content}"></td>
                     <td th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd')}"></td>
                 </tr>
                 </tbody>
